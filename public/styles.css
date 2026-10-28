@@ -1,0 +1,218 @@
+:root {
+  color-scheme: light;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #242620;
+  background: #f7f7f2;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; }
+
+.landing {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px 72px;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+h1 {
+  margin: 20px 0 0;
+  font-size: clamp(3.5rem, 10.5vw, 9rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.065em;
+  /* Compensate for the wordmark's optical right edge. */
+  padding-right: 0.065em;
+}
+
+p {
+  margin: 28px 0 0;
+  color: #6e7067;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.16em;
+  padding-left: 0.16em;
+}
+
+.sculpture {
+  position: relative;
+  width: 320px;
+  height: 240px;
+  flex-shrink: 0;
+}
+
+.aura {
+  position: absolute;
+  z-index: -1;
+  inset: -80px -100px -60px;
+  background: radial-gradient(ellipse at 50% 45%, #eae6f5 0, #eeedf4 25%, #f7f7f200 65%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.ground-shadow {
+  position: absolute;
+  left: 94px;
+  top: 209px;
+  width: 132px;
+  height: 13px;
+  border-radius: 50%;
+  background: #48405a;
+  filter: blur(12px);
+  opacity: 0.12;
+  animation: shadow-breathe 6s ease-in-out infinite;
+}
+
+.orbit { position: absolute; inset: 0; width: 100%; height: 100%; }
+.orbit-back { z-index: 1; }
+.orbit-front { z-index: 3; }
+
+.buddy-float {
+  position: absolute;
+  z-index: 2;
+  left: 104px;
+  top: 48px;
+  width: 112px;
+  height: 116px;
+  animation: hover 6s ease-in-out infinite;
+}
+
+.buddy {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 37% 38% 35% 36%;
+  transform: rotate(-9deg);
+  background:
+    radial-gradient(ellipse at 27% 12%, #e7dfff 0, #d0bfff 13%, transparent 49%),
+    radial-gradient(ellipse at 82% 88%, #5a36b4 0, transparent 55%),
+    linear-gradient(135deg, #b596f4 8%, #9370db 53%, #6c48be 100%);
+  box-shadow:
+    inset 2px 3px 5px #ffffff75,
+    inset -4px -6px 9px #45258d44,
+    0 12px 24px -13px #633cac70;
+  animation: wobble 6s ease-in-out infinite;
+}
+
+.buddy::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #ffffff1a;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.face {
+  position: absolute;
+  top: 51px;
+  left: 37px;
+  display: flex;
+  gap: 16px;
+  animation: look-around 6s ease-in-out infinite;
+}
+
+.eye {
+  width: 7px;
+  height: 12px;
+  border-radius: 8px;
+  background: #302047;
+  box-shadow: 0 1px 0 #ffffff38;
+  transform-origin: center;
+  animation: blink 6s ease-in-out infinite;
+}
+
+.satellite-plane {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-13deg);
+  transform-origin: 160px 164px;
+  animation: orbit-depth 6s linear infinite;
+}
+
+.satellite-position {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  offset-path: ellipse(124px 37px at 160px 164px);
+  offset-rotate: 0deg;
+  animation: orbit 6s linear infinite;
+}
+
+.satellite {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #efffd6 0, #c6e99e 34%, #9bbf78 75%, #77945a 100%);
+  box-shadow: inset 0 0 2px #4f69384d, 0 3px 5px #3e4f2920;
+}
+
+@keyframes hover {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-9deg); }
+  25% { transform: rotate(-3deg); }
+  65% { transform: rotate(-12deg); }
+}
+
+@keyframes look-around {
+  0%, 100% { transform: translate(3px, 0); }
+  25% { transform: translate(0, 3px); }
+  50% { transform: translate(-5px, 0); }
+  75% { transform: translate(0, -2px); }
+}
+
+@keyframes blink {
+  0%, 41%, 45%, 100% { transform: scaleY(1); }
+  43% { transform: scaleY(0.12); }
+}
+
+@keyframes shadow-breathe {
+  0%, 100% { transform: scaleX(1); opacity: 0.12; }
+  50% { transform: scaleX(0.8); opacity: 0.07; }
+}
+
+/* A true motion path keeps the orbit fluid, without JavaScript. */
+@keyframes orbit {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+
+@keyframes orbit-depth {
+  0%, 49.99%, 100% { z-index: 4; }
+  50%, 99.99% { z-index: 1; }
+}
+
+@media (max-width: 480px) {
+  .landing { padding: 28px 20px 60px; }
+  h1 { margin-top: 12px; font-size: clamp(2.8rem, 15vw, 3.9rem); }
+  p { margin-top: 22px; font-size: 0.8125rem; }
+  .sculpture { zoom: 0.9; }
+}
+
+@media (max-height: 560px) and (min-width: 481px) {
+  .landing { padding: 16px 20px 28px; }
+  .sculpture { zoom: 0.7; }
+  h1 { margin-top: 6px; font-size: clamp(3.5rem, 10vw, 5.5rem); }
+  p { margin-top: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; }
+  .satellite-plane { z-index: 4; }
+  .satellite-position { offset-distance: 12.5%; }
+}

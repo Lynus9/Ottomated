@@ -1,0 +1,12 @@
+{
+  "name": "ottomated-coming-soon",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A minimal, static coming-soon page for Ottomated.",
+  "scripts": {
+    "dev": "node scripts/serve.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
