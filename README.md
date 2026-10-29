@@ -1,6 +1,6 @@
 # Ottomated
 
-A single-screen coming-soon page. Plain HTML, CSS, and inline SVG; no runtime JavaScript, dependencies, external fonts, or build step. The decorative character and its orbital bead are CSS animations, with a still composition for `prefers-reduced-motion`.
+A single-screen coming-soon page with a contact modal. Plain HTML, CSS, inline SVG, and a small JavaScript file; no dependencies or compilation step. The purple character and its orbital bead remain CSS animations. Reduced-motion preferences disable the animations and modal transitions.
 
 ## Local preview
 
@@ -13,28 +13,56 @@ Set-Location 'C:\Users\bucka\Documents\Ottomated\Ottomated'
 npm run dev
 ```
 
-Open **http://localhost:3000**. Stop the server with **Ctrl+C**. No `npm install` is needed. Alternatively, open `public/index.html` directly in a browser.
+Open **http://localhost:3000**. Stop the server with **Ctrl+C**. No `npm install` is needed. If port 3000 is in use, set `$env:PORT = '3001'` before running the command.
 
-## Deploy to Cloudflare Pages — when approved
+Use the HTTP preview for the contact form, rather than opening the HTML from disk. The preview serves JavaScript with the correct content type and applies the global security headers from `public/_headers`, matching the production static assets.
 
-Nothing has been deployed. The following steps publish the page, so carry them out only when ready to make it public.
+## Contact form
 
-1. Commit and push this checkout to `https://github.com/Lynus9/Ottomated.git`.
-2. In Cloudflare **Workers & Pages**, create a **Pages** project, connect GitHub, and select **Lynus9/Ottomated**.
-3. Select the branch you pushed and use these settings:
+The **Contact Us** button opens a native modal dialog. It supports X, Escape, outside clicks, keyboard focus trapping, and focus restoration to the trigger. Unsent drafts survive closing and reopening while the page stays loaded; nothing is stored persistently.
 
-   | Setting | Value |
-   | --- | --- |
-   | Framework preset | None |
-   | Root directory | Leave empty (repository root) |
-   | Build command | `exit 0` |
-   | Build output directory | `public` |
+`public/contact.js` validates required values and email format, then sends `name`, `email`, and `message` using `FormData`, `fetch()`, and `Accept: application/json` to:
 
-4. Save and deploy. Check the supplied `pages.dev` address.
-5. In the Pages project's **Custom domains**, choose **Set up a custom domain** and enter **ottomated.ca**. Follow Cloudflare's DNS and certificate instructions. For this apex domain, the domain must be a zone in the same Cloudflare account, with its nameservers pointing to Cloudflare. Review existing DNS records before changing nameservers, preserving records needed for email or other services.
+```text
+https://formspree.io/f/mzeevpda
+```
 
-Git integration automatically deploys future pushes to the production branch. The `public` folder also works with Cloudflare's direct upload option; upload its contents so `index.html` is at the deployment root.
+Sending disables editing and duplicate submissions. Only an HTTP success with Formspree's `ok: true` response reveals the confirmation and clears the fields. Server field errors, other failures, and unexpected responses preserve the draft. A 20-second timeout reports that delivery could not be confirmed. Requests are never retried automatically, and redirects are rejected rather than navigating away.
 
-Only `public/` is served. `public/_headers` supplies basic response security headers on Cloudflare Pages. The local preview server is for development and does not interpret that Cloudflare-specific file.
+Spam filtering and email notifications are handled by the existing Formspree configuration. There is no backend, email library, extra CAPTCHA, or additional service.
 
-References: [Cloudflare static HTML guide](https://developers.cloudflare.com/pages/framework-guides/deploy-anything/) and [custom domains guide](https://developers.cloudflare.com/pages/configuration/custom-domains/).
+The CSP permits only local JavaScript and the specified Formspree endpoint for network requests. Native form navigation remains blocked because submissions must stay asynchronous.
+
+## Automated checks
+
+With **Node.js 22 or newer** and **Microsoft Edge or Google Chrome** installed:
+
+```powershell
+npm test
+```
+
+The dependency-free browser tests start their own local server and isolated headless browser. Every external request is intercepted before network access: Formspree responses are mocked, and **no live submissions are sent**. On systems where the browser is not discovered automatically, set `BROWSER_EXECUTABLE` to its full executable path. The restricted Codex environment may need permission to launch browser subprocesses.
+
+Coverage includes five viewport sizes, existing animation, modal closing methods, Tab/Shift+Tab, focus restoration, required/email validation, FormData and headers, field errors, HTTP 422/429/500, network failures, malformed or unconfirmed success responses, duplicate submission prevention, closing during a pending request, successful confirmation, and reduced motion. Screenshots are saved in the ignored `.preview/contact-tests/` directory. JavaScript syntax is also checked.
+
+This is a buildless static project: the production artifact is the existing `public/` directory. There is no framework production build to run.
+
+## Existing production deployment
+
+The live website is **https://ottomated.ca**, deployed from GitHub to Cloudflare Workers. Keep the existing GitHub/Workers deployment configuration and static asset directory (`public`). This checkout contains no local Wrangler configuration. No new Worker, backend route, hosting project, DNS changes, or deployment configuration is needed for the contact form.
+
+**Do not push to the production branch or deploy until approved:** GitHub integration may automatically publish pushes. The contact form changes have only been tested locally.
+
+Cloudflare serves the static response headers from `public/_headers`. This change adds permission for `public/contact.js` and requests to the existing Formspree endpoint; the remaining restrictions are retained.
+
+## Verify one real submission reaches Google Workspace
+
+1. In the existing Formspree form's dashboard, confirm that its notification recipient is your intended Google Workspace email address and that any required email verification is complete.
+2. Start the local preview with `npm run dev`, open **Contact Us**, and enter your name, a real reply-to email address, and a unique message such as **Ottomated contact test - [date/time]**.
+3. Click **Send Message** once. This is a real submission and counts toward your Formspree allowance. Wait for **Message sent!**; that confirms Formspree accepted it, not that Google has delivered the notification.
+4. Find the same unique message in the Formspree submissions dashboard and in your Google Workspace inbox. If it is missing from the inbox, check Gmail Spam/All Mail and Formspree's notification recipient/settings before sending another test.
+5. If Formspree restricts submissions to the production domain, test after the approved deployment or from an allowed preview origin. An origin/CAPTCHA restriction will be shown as a failure; this frontend does not bypass it.
+
+After an approved deployment, the same single-submission check can be performed on `ottomated.ca`. No live submission has been sent by the automated checks.
+
+References: [Formspree AJAX documentation](https://help.formspree.io/hc/en-us/articles/360013470814-Submit-forms-with-JavaScript-AJAX), [Formspree manual fetch example](https://formspree.io/blog/formspree-ajax/), and [Cloudflare Workers static headers](https://developers.cloudflare.com/workers/static-assets/headers/).
