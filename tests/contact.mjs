@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { once } from 'node:events';
 import { setTimeout as delay } from 'node:timers/promises';
+import { verifyProcess } from './process.mjs';
 
 if (typeof WebSocket === 'undefined') throw new Error('Browser tests require Node.js 22 or newer.');
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -20,7 +21,7 @@ const candidates = [process.env.BROWSER_EXECUTABLE,
 let executable;
 for (const path of candidates) { try { await access(path); executable = path; break; } catch {} }
 assert.ok(executable, 'Install Edge/Chrome or set BROWSER_EXECUTABLE to its full path.');
-for (const file of ['public/contact.js', 'scripts/serve.mjs']) {
+for (const file of ['public/contact.js', 'public/process.js', 'scripts/serve.mjs']) {
   assert.equal(spawnSync(process.execPath, ['--check', file], { cwd: root }).status, 0, `${file} parses`);
 }
 
@@ -95,13 +96,14 @@ try {
   const click = selector => evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
   async function key(key, shift = false) {
     const modifiers = shift ? 8 : 0;
-    const windowsVirtualKeyCode = { Tab: 9, Escape: 27 }[key];
+    const windowsVirtualKeyCode = { Tab: 9, Escape: 27, Enter: 13 }[key];
     await send('Input.dispatchKeyEvent', { type: 'keyDown', key, code: key, modifiers, windowsVirtualKeyCode });
     await send('Input.dispatchKeyEvent', { type: 'keyUp', key, code: key, modifiers, windowsVirtualKeyCode });
   }
-  async function screenshot(name) {
+  async function screenshot(name, fullPage = false) {
     await delay(240);
-    const { data } = await send('Page.captureScreenshot', { format: 'png' });
+    const metrics = fullPage ? await send('Page.getLayoutMetrics') : null;
+    const { data } = await send('Page.captureScreenshot', { format: 'png', ...(metrics ? { captureBeyondViewport: true, clip: { x: 0, y: 0, width: metrics.cssContentSize.width, height: metrics.cssContentSize.height, scale: 1 } } : {}) });
     await writeFile(join(output, `${name}.png`), Buffer.from(data, 'base64'));
   }
   async function open() { await click('#contact-trigger'); await waitFor("document.querySelector('dialog').open && document.activeElement.id === 'contact-name'"); }
@@ -237,6 +239,8 @@ try {
   await close();
   assert.equal(exceptions.length, 0, JSON.stringify(exceptions));
   report.push('Reduced-motion disables animations; no uncaught browser errors.');
+  await verifyProcess({ origin, send, evaluate, waitFor, click, key, screenshot, report });
+  assert.equal(exceptions.length, 0, JSON.stringify(exceptions));
   console.log(report.map(line => `PASS ${line}`).join('\n'));
   console.log(`${calls.length} mocked submissions; zero live Formspree submissions. Screenshots: .preview/contact-tests/`);
 } finally {

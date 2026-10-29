@@ -1,0 +1,82 @@
+.process-header, .process-main {
+  width: min(864px, calc(100% - 96px));
+  margin-inline: auto;
+}
+
+.process-header { padding-top: 48px; }
+.home-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; color: #625b6b; text-decoration: none; }
+.home-link span { color: #242620; font-size: 1.375rem; font-weight: 600; letter-spacing: -0.065em; }
+.home-link svg { transition: transform 180ms ease; }
+.home-link:hover svg { transform: translateX(-3px); }
+.home-link:focus-visible { outline: 2px solid #8056bd; outline-offset: 6px; border-radius: 4px; }
+
+.process-main { padding-bottom: 150px; }
+.process-intro { margin: 100px 0 96px; }
+.process-intro h1 { margin: 0; padding: 0; font-size: clamp(3.25rem, 7.5vw, 5.75rem); font-weight: 600; line-height: 1.08; letter-spacing: -0.065em; }
+.process-intro p { max-width: 520px; margin: 26px 0 0; padding: 0; color: #6e7067; font-size: 1.125rem; line-height: 1.7; letter-spacing: 0; }
+
+.process-timeline { position: relative; }
+.process-steps { margin: 0; padding: 0; list-style: none; }
+.process-step { position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); column-gap: 40px; padding-bottom: 96px; }
+.process-step:last-child { padding-bottom: 0; }
+
+/* A complete static timeline is the default, including without JavaScript. */
+.process-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 25.5px;
+  top: 26px;
+  width: 1px;
+  height: 100%;
+  background: #c7b6dd;
+}
+
+.step-number {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid #d3c4e5;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #f3eefb, #e7ddf3);
+  color: #70469f;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 1px 0 #fff9, 0 5px 14px -9px #7951b84d;
+  transition: background 400ms ease, border-color 400ms ease, color 400ms ease, box-shadow 400ms ease;
+}
+
+.step-content { padding-top: 8px; }
+.step-content h2 { margin: 0; font-size: 1.875rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.04em; }
+.step-content p { max-width: 515px; margin: 16px 0 0; padding: 0; color: #6e7067; font-size: 1rem; line-height: 1.85; letter-spacing: 0; }
+
+.timeline-track { display: none; position: absolute; z-index: 0; left: 25.5px; top: var(--track-top); height: var(--track-length); width: 1px; background: #dedbe3; }
+.timeline-fill { height: 100%; background: #a78acb; transform: scaleY(var(--progress, 0)); transform-origin: top; transition: transform 200ms ease-out; }
+.timeline-tip { position: absolute; left: -4px; top: -4px; width: 9px; height: 9px; border: 1px solid #9dbf7b; border-radius: 50%; background: radial-gradient(circle at 30% 25%, #eafacf, #b9d99a 60%, #9bbf78); transform: translateY(var(--progress-distance, 0px)); transition: transform 200ms ease-out; }
+.timeline-enhanced .timeline-track { display: block; }
+.timeline-enhanced .process-step::before { display: none; }
+.timeline-enhanced .process-step:not(.is-reached) .step-number { border-color: #dfdce4; background: #f3f2ee; color: #73706e; box-shadow: none; }
+
+@media (max-width: 600px) {
+  .process-header, .process-main { width: calc(100% - 48px); }
+  .process-header { padding-top: 24px; }
+  .process-main { padding-bottom: 100px; }
+  .process-intro { margin: 64px 0 64px; }
+  .process-intro h1 { font-size: clamp(2.75rem, 10.8vw, 3.5rem); }
+  .process-intro p { font-size: 1rem; margin-top: 22px; }
+  .process-step { grid-template-columns: 44px minmax(0, 1fr); column-gap: 24px; padding-bottom: 64px; }
+  .step-number { width: 44px; height: 44px; border-radius: 15px; font-size: 0.8125rem; }
+  .process-step:not(:last-child)::before { left: 21.5px; top: 22px; }
+  .timeline-track { left: 21.5px; }
+  .step-content { padding-top: 6px; }
+  .step-content h2 { font-size: clamp(1.375rem, 5.5vw, 1.625rem); }
+  .step-content p { margin-top: 13px; font-size: 0.9375rem; line-height: 1.8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-link svg, .step-number, .timeline-fill, .timeline-tip { transition: none; }
+  .home-link:hover svg { transform: none; }
+}

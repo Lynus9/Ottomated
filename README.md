@@ -1,6 +1,6 @@
 # Ottomated
 
-A single-screen coming-soon page with a contact modal. Plain HTML, CSS, inline SVG, and a small JavaScript file; no dependencies or compilation step. The purple character and its orbital bead remain CSS animations. Reduced-motion preferences disable the animations and modal transitions.
+A single-screen landing page with a contact modal, plus a focused How We Work page. Plain HTML, CSS, inline SVG, and small JavaScript files; no dependencies or compilation step. The purple character and its orbital bead remain CSS animations. Reduced-motion preferences disable motion effects.
 
 ## Local preview
 
@@ -15,7 +15,17 @@ npm run dev
 
 Open **http://localhost:3000**. Stop the server with **Ctrl+C**. No `npm install` is needed. If port 3000 is in use, set `$env:PORT = '3001'` before running the command.
 
+Preview the new page at **http://localhost:3000/how-we-work** (or port 3001 if selected). You can also follow **How We Work** from the homepage, and use the arrow/Ottomated link to return home.
+
 Use the HTTP preview for the contact form, rather than opening the HTML from disk. The preview serves JavaScript with the correct content type and applies the global security headers from `public/_headers`, matching the production static assets.
+
+## How We Work
+
+`public/how-we-work.html` contains the four-step process, with the shared brand styles in `styles.css` and page-specific styles in `process.css`. `process.js` extends a fine vertical line and moves a small mint marker as visitors scroll. The numbered steps illuminate as the line reaches them. Text is always visible, and reduced-motion or JavaScript-off visitors get a complete static timeline. Scroll and resize events share a single animation-frame update, with no animation library or continuous rendering loop.
+
+The homepage layout, animation, contact markup, and Formspree script are preserved. Its only new element is the quiet **How We Work** link in the upper-right corner. The process page's back link returns to the existing homepage and contact form.
+
+Cloudflare Workers' default static HTML handling serves `public/how-we-work.html` at `/how-we-work`, including direct navigation and refresh. The local preview server resolves extensionless HTML paths as well. Assets on the process page use root-relative URLs so they also work with a trailing slash. No Worker routing code or deployment configuration was added. See [Cloudflare HTML handling](https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/).
 
 ## Contact form
 
@@ -43,7 +53,7 @@ npm test
 
 The dependency-free browser tests start their own local server and isolated headless browser. Every external request is intercepted before network access: Formspree responses are mocked, and **no live submissions are sent**. On systems where the browser is not discovered automatically, set `BROWSER_EXECUTABLE` to its full executable path. The restricted Codex environment may need permission to launch browser subprocesses.
 
-Coverage includes five viewport sizes, existing animation, modal closing methods, Tab/Shift+Tab, focus restoration, required/email validation, FormData and headers, field errors, HTTP 422/429/500, network failures, malformed or unconfirmed success responses, duplicate submission prevention, closing during a pending request, successful confirmation, and reduced motion. Screenshots are saved in the ignored `.preview/contact-tests/` directory. JavaScript syntax is also checked.
+Coverage includes five viewport sizes, existing animation, modal closing methods, Tab/Shift+Tab, focus restoration, required/email validation, FormData and headers, field errors, HTTP 422/429/500, network failures, malformed or unconfirmed success responses, duplicate submission prevention, closing during a pending request, successful confirmation, and reduced motion. Process-page checks cover direct URLs, refresh, homepage/back navigation, metadata, accessible list structure, scroll progression, small screens, reduced motion, and a JavaScript-off fallback. Screenshots are saved in the ignored `.preview/contact-tests/` directory. JavaScript syntax is also checked.
 
 This is a buildless static project: the production artifact is the existing `public/` directory. There is no framework production build to run.
 

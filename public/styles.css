@@ -240,6 +240,25 @@ body.contact-open { overflow: hidden; }
 
 .contact-trigger:hover { background: #efebf5; border-color: #bca8da; color: #573682; }
 
+.process-link {
+  position: absolute;
+  top: 28px;
+  right: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  color: #6e7067;
+  text-decoration: none;
+  font-size: 0.8125rem;
+}
+.process-link:hover { color: #70469f; }
+.process-link:focus-visible { outline: 2px solid #8056bd; outline-offset: 5px; border-radius: 4px; }
+
+@media (max-width: 480px) {
+  .process-link { top: 12px; right: 20px; }
+}
+
 .contact-dialog {
   width: min(480px, calc(100% - 32px));
   max-height: calc(100vh - 32px);

@@ -10,7 +10,9 @@ const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=
 const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-    const file = resolve(root, `.${pathname === '/' ? '/index.html' : pathname}`);
+    // Match Cloudflare static HTML handling: /how-we-work serves how-we-work.html.
+    const htmlPath = pathname === '/' ? '/index.html' : !extname(pathname) ? `${pathname.replace(/\/$/, '')}.html` : pathname;
+    const file = resolve(root, `.${htmlPath}`);
     if (!file.startsWith(root.endsWith(sep) ? root : `${root}${sep}`) || !types[extname(file)]) {
       response.writeHead(404).end('Not found');
       return;
